@@ -14,15 +14,7 @@ Game::Game(int width, int height, std::string title) :
     this->width = width;
     this->height = height;
 
-    paddle.setPosition((width-paddleWidth)/2, height - paddleHeight - marginHeight);
-    ball.setPosition((width-2*ballRadius)/2, height-paddleHeight-2*ballRadius-1-marginHeight);
-    ballheld = 1;
-
-    lives = 3;
-    lvl = 1;
-    score = 0;
-
-    loadBricksFromFile("1.lvl");
+    toInitState();
 
     if(!font.loadFromFile("Akronim-Regular.ttf"))
     {
@@ -35,6 +27,7 @@ Game::Game(int width, int height, std::string title) :
 
     startText.setFont(font);
     exitText.setFont(font);
+    gameOverText.setFont(font);
     startText.setCharacterSize(titleSize);
     startText.setFillColor(sf::Color::Green);
     startText.setString("START");
@@ -45,6 +38,11 @@ Game::Game(int width, int height, std::string title) :
     exitText.setPosition(sf::Vector2f((width-exitText.getLocalBounds().width)/2,
                                       height/2));
 
+    gameOverText.setCharacterSize(bigTextSize);
+    gameOverText.setFillColor(sf::Color::Red);
+    gameOverText.setString("Game Over");
+    gameOverText.setPosition(sf::Vector2f((width-gameOverText.getLocalBounds().width)/2,
+                                          height/2-bigTextSize));
 
     border.setPosition(sf::Vector2f(marginWidth,marginHeight));
     border.setOutlineThickness(1);
@@ -52,6 +50,20 @@ Game::Game(int width, int height, std::string title) :
     border.setFillColor(sf::Color::Transparent);
 
 //            window.setKeyRepeatEnabled(false);
+}
+
+void Game::toInitState() {
+
+    paddle.setPosition((width-paddleWidth)/2, height - paddleHeight - marginHeight);
+    ball.setPosition((width-2*ballRadius)/2, height-paddleHeight-2*ballRadius-1-marginHeight);
+    ballheld = 1;
+
+    lives = 3;
+    lvl = 1;
+    score = 0;
+
+    bricks.clear();
+
 }
 
 void Game::loadBricksFromFile(char* str)
@@ -141,6 +153,8 @@ void Game::draw()
         window.draw(paddle);
         window.draw(ball);
         drawInfo();
+    } else if(screen == 2) {
+        window.draw(gameOverText);
     }
     window.draw(border);
 
@@ -179,6 +193,8 @@ void Game::handleEvents()
                         ballheld = 0;
                     }
                 }
+            } else if(screen == 2) {
+                screen = 0;
             }
             break;
         case sf::Event::KeyReleased:
@@ -236,6 +252,7 @@ void Game::handleEvents()
                     if(startRect.contains(x,y))
                     {
                         screen=1;
+                        loadBricksFromFile("1.lvl");
                     }
                     else if(exitRect.contains(x,y))
                     {
@@ -276,6 +293,10 @@ void Game::update(float dt)
             if(bPos.y+d >= height-marginHeight)
             {
                 lives--;
+                if(lives == 0) {
+                    screen = 2;
+                    toInitState();
+                }
                 ballheld=1;
                 return;
             }

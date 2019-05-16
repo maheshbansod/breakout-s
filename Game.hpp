@@ -15,6 +15,7 @@ class Game {
     sf::Font font;
     sf::Text startText;
     sf::Text exitText;
+    sf::Text gameOverText;
     sf::RectangleShape border;
     Paddle paddle;
     Ball ball;
@@ -33,6 +34,7 @@ class Game {
     static const int marginHeight = 50;
     static const int brickHeight = 30;
     static const int titleSize = 50;
+    static const int bigTextSize = 100;
 
     int brickWidth;
 
@@ -43,6 +45,8 @@ public:
     void draw();
     void drawInfo();
     void resetTextColors();
+
+    void toInitState();
 
     bool isRunning();
     int hasCollided(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
