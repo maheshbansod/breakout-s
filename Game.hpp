@@ -15,6 +15,7 @@ class Game {
     sf::Font font;
     sf::Text startText;
     sf::Text exitText;
+    sf::Text gameWinText;
     sf::Text gameOverText;
     sf::RectangleShape border;
     Paddle paddle;
@@ -46,12 +47,14 @@ public:
     void drawInfo();
     void resetTextColors();
 
+    void nextLevel();
+
     void toInitState();
 
     bool isRunning();
     int hasCollided(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
 
-    void loadBricksFromFile(char *str);
+    bool loadBricksFromFile(const char *str);
 };
 
 #endif

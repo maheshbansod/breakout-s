@@ -28,6 +28,8 @@ Game::Game(int width, int height, std::string title) :
     startText.setFont(font);
     exitText.setFont(font);
     gameOverText.setFont(font);
+    gameWinText.setFont(font);
+
     startText.setCharacterSize(titleSize);
     startText.setFillColor(sf::Color::Green);
     startText.setString("START");
@@ -42,7 +44,13 @@ Game::Game(int width, int height, std::string title) :
     gameOverText.setFillColor(sf::Color::Red);
     gameOverText.setString("Game Over");
     gameOverText.setPosition(sf::Vector2f((width-gameOverText.getLocalBounds().width)/2,
-                                          height/2-bigTextSize));
+                                          height/2-bigTextSize));gameOverText.setCharacterSize(bigTextSize);
+
+    gameWinText.setCharacterSize(titleSize);
+    gameWinText.setFillColor(sf::Color::Green);
+    gameWinText.setString("Err.. it seems we ran out of levels\nYou win, I guess");
+    gameWinText.setPosition(sf::Vector2f((width-gameWinText.getLocalBounds().width)/2,
+                                          height/2-titleSize));
 
     border.setPosition(sf::Vector2f(marginWidth,marginHeight));
     border.setOutlineThickness(1);
@@ -66,14 +74,14 @@ void Game::toInitState() {
 
 }
 
-void Game::loadBricksFromFile(char* str)
+bool Game::loadBricksFromFile(const char* str)
 {
     FILE *f = fopen(str, "r");
     if(f == NULL)
     {
         //std::cout<< "Couldn't open file";
         //error
-        return;
+        return false;
     }
     char ch;
     int px = marginWidth,py=marginHeight;
@@ -99,6 +107,8 @@ void Game::loadBricksFromFile(char* str)
         px+=brickWidth;
     }
     fclose(f);
+
+    return true;
 }
 
 void Game::drawInfo()
@@ -155,6 +165,8 @@ void Game::draw()
         drawInfo();
     } else if(screen == 2) {
         window.draw(gameOverText);
+    } else if(screen == 3) {
+        window.draw(gameWinText);
     }
     window.draw(border);
 
@@ -193,7 +205,7 @@ void Game::handleEvents()
                         ballheld = 0;
                     }
                 }
-            } else if(screen == 2) {
+            } else if(screen == 2 || screen == 3) {
                 screen = 0;
             }
             break;
@@ -322,14 +334,16 @@ void Game::update(float dt)
             if(colstat != 0)
             {
                 ball.revert(dt);
-                ball.bounce(colstat);
-                //std::cout << "i"<<(*it)->getType() <<std::endl;
+                //ball.bounce(colstat);
                 score += (*it)->getType();
                 (*it)->demote();
-                //std::cout << "f"<<(*it)->getType() <<std::endl;
                 if((*it)->getType()==0)
                 {
                     bricks.erase(it++);
+                    if(bricks.empty()) {
+                        nextLevel();
+                        ballheld =1 ;
+                    }
                 }
                 else ++it;
                 break;
@@ -340,6 +354,17 @@ void Game::update(float dt)
             }
         }
     }//else part of ballheld==1
+}
+
+void Game::nextLevel() {
+    lvl++;
+    std::stringstream str;
+    str << lvl << ".lvl";
+    std::string s = str.str();
+    if(!loadBricksFromFile(s.c_str())) {
+        screen = 3;
+        toInitState();
+    }
 }
 
 int Game::hasCollided(sf::Vector2f pos1, sf::Vector2f size1, sf::Vector2f pos2, sf::Vector2f size2)
