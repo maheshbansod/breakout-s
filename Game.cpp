@@ -5,14 +5,13 @@
 #define PI 3.1415926535
 
 Game::Game(int width, int height, std::string title) :
-    window(sf::VideoMode(width, height), title, sf::Style::Default),
+    window(sf::VideoMode(width, height), title, sf::Style::Fullscreen),
     paddle(paddleWidth,paddleHeight),
-    ball(ballRadius),
-    border(sf::Vector2f(width-2*marginWidth, height-2*marginHeight))
+    ball(ballRadius)
 {
     this->screen = 0;
-    this->width = width;
-    this->height = height;
+    this->width = width = window.getSize().x;
+    this->height = height = window.getSize().y;
 
     toInitState();
 
@@ -56,6 +55,7 @@ Game::Game(int width, int height, std::string title) :
     border.setOutlineThickness(1);
     border.setOutlineColor(sf::Color::White);
     border.setFillColor(sf::Color::Transparent);
+    border.setSize(sf::Vector2f(width-2*marginWidth, height-2*marginHeight));
 
 //            window.setKeyRepeatEnabled(false);
 }
