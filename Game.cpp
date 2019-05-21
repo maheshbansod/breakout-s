@@ -334,7 +334,7 @@ void Game::update(float dt)
             if(colstat != 0)
             {
                 ball.revert(dt);
-                //ball.bounce(colstat);
+                ball.bounce(colstat);
                 score += (*it)->getType();
                 (*it)->demote();
                 if((*it)->getType()==0)
@@ -388,8 +388,9 @@ int Game::hasCollided(sf::Vector2f pos1, sf::Vector2f size1, sf::Vector2f pos2, 
             return 2; /**vertical bounce**/
         else if(pos1yin && pos1endyin)
             return 1; /**horizontal bounces**/
-        else
+        else {
             return 3; /**diagonal bounce**/
+        }
     }
     return 0;
 }

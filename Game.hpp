@@ -33,7 +33,7 @@ class Game {
     static const int ballInitVel = 500;
     static const int marginWidth = 10;
     static const int marginHeight = 50;
-    static const int brickHeight = 30;
+    static const int brickHeight = 40;
     static const int titleSize = 50;
     static const int bigTextSize = 100;
 
